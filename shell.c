@@ -44,12 +44,14 @@ void prompt_print(){
   char *cwd = getcwd(NULL, 0);
   if (cwd == NULL) perror("getcwd error");
   
+  //get username with struct passwd
   uid_t usr = geteuid();
   struct passwd * pas = getpwuid(usr);
 
   printf(GREEN"%s"COLOREND":"BLUE"%s"COLOREND"$", pas->pw_name, cwd);
   
   free(cwd);
+  free(pas);
   fflush(stdout);
 }
 
