@@ -6,9 +6,11 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <errno.h>
+#include <pwd.h>
 
 #include "parse.h"
 #include "colors.h"
+
 
 #define BUFFER_SIZE 256
 #define TOKEN_SIZE 256
@@ -42,9 +44,10 @@ void prompt_print(){
   char *cwd = getcwd(NULL, 0);
   if (cwd == NULL) perror("getcwd error");
   
-  char * usr = getlogin();
+  uid_t usr = geteuid();
+  struct passwd * pas = getpwuid(usr);
 
-  printf(GREEN"%s"COLOREND":"BLUE"%s"COLOREND"$", usr, cwd);
+  printf(GREEN"%s"COLOREND":"BLUE"%s"COLOREND"$", pas->pw_name, cwd);
   
   free(cwd);
   fflush(stdout);
