@@ -5,6 +5,7 @@
 #include <signal.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <errno.h>
 
 #include "parse.h"
 #include "colors.h"
@@ -12,16 +13,24 @@
 #define BUFFER_SIZE 256
 #define TOKEN_SIZE 256
 
+int check_err(int err, char * err_type){
+  if(err == -1){
+    char err_buff[BUFFER_SIZE];
+    sprintf(err_buff, "%s: %s", err_type, strerror(errno));
+    perror(err_buff);
+    return -1;
+  }
+  return 0;
+}
+
 int special_cmd(char ** arg_ary){
   if(!strcmp(arg_ary[0], "exit")) {
     exit(0);
   }
   //if it was cd change dir
   if (!strcmp(arg_ary[0], "cd")) {
-    if (chdir(arg_ary[1])) perror("chdir error");
-    
+    check_err(chdir(arg_ary[1]), "chdir error");
     return 1;
-    
   }
  
   return 0;
@@ -77,10 +86,15 @@ int main(){
       if(!special_cmd(arg_ary)){
 
         //No special cmd -> fork
-        if(!fork()){
+        int fork_result = fork();
+        check_err(fork_result, "fork error");
+        if(!fork_result){
           //child
           sigaction(SIGINT, &old, NULL);
-          execvp(arg_ary[0], arg_ary);
+          int exec_vp_result = execvp(arg_ary[0], arg_ary);
+          if(check_err(exec_vp_result, "execvp err")){
+            exit(0);
+          }
         }
         else{
           int status;
