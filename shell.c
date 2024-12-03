@@ -13,7 +13,7 @@
 #include "shell.h"
 #include "prompt.h"
 #include "util.h"
-
+#include "redirect.h"
 
 
 int special_cmd(char ** arg_ary){
@@ -44,6 +44,7 @@ int main(){
   sigaction(SIGINT, &sa, &old);
   
   prompt_print();
+  redirect_stdout_create_file("test");
   
   char input_buffer[BUFFER_SIZE];
   while (fgets(input_buffer, BUFFER_SIZE, stdin)){

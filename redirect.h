@@ -7,6 +7,6 @@ int redirect_stdout_create_file(char * name);
 int redirect_stdin(int fd);
 int redurect_stdin_create_file(char * name);
 
-int reset_fds(int old_stdin, int old_stdout);
+void reset_fds(int old_stdin, int old_stdout);
 
 #endif
