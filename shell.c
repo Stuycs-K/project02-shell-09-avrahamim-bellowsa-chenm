@@ -11,20 +11,11 @@
 
 #include "parse.h"
 #include "colors.h"
+#include "shell.h"
+#include "prompt.h"
+#include "util.h"
 
 
-#define BUFFER_SIZE 256
-#define TOKEN_SIZE 256
-
-int check_err(int err, char * err_type){
-  if(err == -1){
-    char err_buff[BUFFER_SIZE];
-    sprintf(err_buff, "%s: %s", err_type, strerror(errno));
-    perror(err_buff);
-    return -1;
-  }
-  return 0;
-}
 
 int special_cmd(char ** arg_ary){
   if(!strcmp(arg_ary[0], "exit")) {
@@ -40,41 +31,6 @@ int special_cmd(char ** arg_ary){
     return 1;
   }
   return 0;
-}
-
-//print prompt, includes pwd and $
-void prompt_print(){
-  //dynamically stores cwd in string
-  char *cwd = getcwd(NULL, 0);
-  if (cwd == NULL){
-    perror("getcwd error");
-  }
-
-  char * home;
-  char * newCWD;
-  char tilda[256];
-  tilda[0] = '~';
-  tilda[1] = '\0';
-  if ((home = getenv("HOME"))){
-    //printf("Home: %s\n",home);
-    if ((newCWD = strstr(cwd, home))){
-      newCWD += strlen(home);
-      strcat(tilda, newCWD);
-      strcpy(cwd, tilda);
-      //printf("%s\n", cwd);
-    }
-  }
-
-  //get username with struct passwd
-  uid_t usr = geteuid();
-  struct passwd * pas = getpwuid(usr);
-
-
-  printf("\n");
-  printf(GREEN"%s"COLOREND":"BLUE"%s"COLOREND"$ ", pas->pw_name, cwd);
-  fflush(stdout);
-
-  free(cwd);
 }
 
 void sighandler(int signo){

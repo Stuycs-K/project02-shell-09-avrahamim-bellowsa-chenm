@@ -1,7 +1,11 @@
 #include <stdio.h>
+#include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
+#include <signal.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <errno.h>
 
 void parse_args( char * line, char ** arg_ary ){
   int argIndex = 0;
