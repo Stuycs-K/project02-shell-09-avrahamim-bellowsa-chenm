@@ -1,3 +1,4 @@
+#define _POSIX_C_SOURCE 200809L
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -35,6 +36,9 @@ int special_cmd(char ** arg_ary){
     return 1;
   }
  
+  if(!strcmp(arg_ary[0], "")){
+    return 1;
+  }
   return 0;
 }
 
@@ -42,17 +46,20 @@ int special_cmd(char ** arg_ary){
 void prompt_print(){
   //dynamically stores cwd in string
   char *cwd = getcwd(NULL, 0);
-  if (cwd == NULL) perror("getcwd error");
+  if (cwd == NULL){
+    perror("getcwd error");
+  }
   
   //get username with struct passwd
   uid_t usr = geteuid();
   struct passwd * pas = getpwuid(usr);
+  
 
+  printf("\n");
   printf(GREEN"%s"COLOREND":"BLUE"%s"COLOREND"$", pas->pw_name, cwd);
+  fflush(stdout);
   
   free(cwd);
-  free(pas);
-  fflush(stdout);
 }
 
 void sighandler(int signo){
