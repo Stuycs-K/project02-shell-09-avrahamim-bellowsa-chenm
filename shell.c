@@ -12,6 +12,21 @@
 #define BUFFER_SIZE 256
 #define TOKEN_SIZE 256
 
+int special_cmd(char ** arg_ary){
+  if(!strcmp(arg_ary[0], "exit")) {
+    exit(0);
+  }
+  //if it was cd change dir
+  if (!strcmp(arg_ary[0], "cd")) {
+    if (chdir(arg_ary[1])) perror("chdir error");
+    
+    return 1;
+    
+  }
+
+  return 0;
+}
+
 //print prompt, includes pwd and $
 void prompt_print(){
   //dynamically stores cwd in string
@@ -42,39 +57,38 @@ int main(){
   
   prompt_print();
   
-  char line[BUFFER_SIZE];
-  while (fgets(line, BUFFER_SIZE, stdin)){
+  char input_buffer[BUFFER_SIZE];
+  while (fgets(input_buffer, BUFFER_SIZE, stdin)){
 
-    line[strlen(line) - 1] = 0;//delete newline
-    char *arg_ary[TOKEN_SIZE];
-    parse_args(line, arg_ary);
+    char * lines_ary[TOKEN_SIZE];
 
-    //CHECK IF USER ENTERED A SPECIAL CMD
-    // if it was exit stop the program
-    if(!strcmp(arg_ary[0], "exit")) {
-      exit(0);
-    }
-    //if it was cd change dir
-    if (!strcmp(arg_ary[0], "cd")) {
-      if (chdir(arg_ary[1])) perror("chdir error");
-      else {
-        prompt_print();
-        continue;
+    parse_lines(input_buffer, lines_ary);
+
+    for(int i = 0; lines_ary[i]; i++){
+      char * line = lines_ary[i];
+      char * new_line_pos;
+      while (new_line_pos = strchr(line, '\n')){
+        *new_line_pos = 0;
       }
-    }
+      char *arg_ary[TOKEN_SIZE];
+      parse_args(line, arg_ary);
 
-    //No special cmd -> fork
-    if(!fork()){
-      //child
-      sigaction(SIGINT, &old, NULL);
-      execvp(arg_ary[0], arg_ary);
-    }
-    else{
-      int status;
-      int kid_id = wait(&status); //wait for child
+      //CHECK IF USER ENTERED A SPECIAL CMD
+      if(!special_cmd(arg_ary)){
+
+        //No special cmd -> fork
+        if(!fork()){
+          //child
+          sigaction(SIGINT, &old, NULL);
+          execvp(arg_ary[0], arg_ary);
+        }
+        else{
+          int status;
+          int kid_id = wait(&status); //wait for child
+        }
+      }
     }
     prompt_print();
   }
-  
   return 0;
 }
