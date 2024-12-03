@@ -1,4 +1,3 @@
-#include "parse.h"
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -6,6 +5,9 @@
 #include <signal.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+
+#include "parse.h"
+#include "colors.h"
 
 #define BUFFER_SIZE 256
 #define TOKEN_SIZE 256
@@ -16,7 +18,9 @@ void prompt_print(){
   char *cwd = getcwd(NULL, 0);
   if (cwd == NULL) perror("getcwd error");
   
-  printf("%s $", cwd);
+  char * usr = getlogin();
+
+  printf(GREEN"%s"COLOREND":"BLUE"%s"COLOREND"$", usr, cwd);
   
   free(cwd);
   fflush(stdout);
@@ -45,11 +49,13 @@ int main(){
     char *arg_ary[TOKEN_SIZE];
     parse_args(line, arg_ary);
 
+    //CHECK IF USER ENTERED A SPECIAL CMD
     // if it was exit stop the program
     if(!strcmp(arg_ary[0], "exit")) {
       exit(0);
     }
-    else if (!strcmp(arg_ary[0], "cd")) {
+    //if it was cd change dir
+    if (!strcmp(arg_ary[0], "cd")) {
       if (chdir(arg_ary[1])) perror("chdir error");
       else {
         prompt_print();
@@ -57,9 +63,9 @@ int main(){
       }
     }
 
-    //cmd isn't cd or exit
-    // fork
+    //No special cmd -> fork
     if(!fork()){
+      //child
       sigaction(SIGINT, &old, NULL);
       execvp(arg_ary[0], arg_ary);
     }
