@@ -7,20 +7,30 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
+void prompt_print(){
+  //print prompt
+    printf("\n>> ");
+    fflush(stdout);
+}
+
 void sighandler(int signo){
   if(signo==SIGINT){
-
+    prompt_print();
   }
 }
 
 int main(){
-  signal(SIGINT, sighandler);
+  struct sigaction sa;
+  struct sigaction old;
+  sa.sa_handler = sighandler;
+  sa.sa_flags = SA_RESTART;
+  sigemptyset(&sa.sa_mask);
+  sigaction(SIGINT, &sa, &old);
+  
   while (1){
 
-    //print prompt
-    printf(">> ");
-    fflush(stdout);
-
+    
+    prompt_print();
     //get cmd
     char line[256];
     if(fgets(line, 256, stdin)){
@@ -35,6 +45,7 @@ int main(){
 
       // fork
       if(!fork()){
+        sigaction(SIGINT, &old, NULL);
         execvp(arg_ary[0], arg_ary);
       }
       else{
