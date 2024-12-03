@@ -35,7 +35,7 @@ int special_cmd(char ** arg_ary){
     check_err(chdir(arg_ary[1]), "chdir error");
     return 1;
   }
- 
+
   if(!strcmp(arg_ary[0], "")){
     return 1;
   }
@@ -49,16 +49,31 @@ void prompt_print(){
   if (cwd == NULL){
     perror("getcwd error");
   }
-  
+
+  char * home;
+  char * newCWD;
+  char tilda[256];
+  tilda[0] = '~';
+  tilda[1] = '\0';
+  if ((home = getenv("HOME"))){
+    //printf("Home: %s\n",home);
+    if ((newCWD = strstr(cwd, home))){
+      newCWD += strlen(home);
+      strcat(tilda, newCWD);
+      strcpy(cwd, tilda);
+      //printf("%s\n", cwd);
+    }
+  }
+
   //get username with struct passwd
   uid_t usr = geteuid();
   struct passwd * pas = getpwuid(usr);
-  
+
 
   printf("\n");
   printf(GREEN"%s"COLOREND":"BLUE"%s"COLOREND"$ ", pas->pw_name, cwd);
   fflush(stdout);
-  
+
   free(cwd);
 }
 
@@ -75,9 +90,9 @@ int main(){
   sa.sa_flags = SA_RESTART;
   sigemptyset(&sa.sa_mask);
   sigaction(SIGINT, &sa, &old);
-  
+
   prompt_print();
-  
+
   char input_buffer[BUFFER_SIZE];
   while (fgets(input_buffer, BUFFER_SIZE, stdin)){
 
