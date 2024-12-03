@@ -7,10 +7,19 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
+#define BUFFER_SIZE 256
+#define TOKEN_SIZE 256
+
+//print prompt, includes pwd and $
 void prompt_print(){
-  //print prompt
-    printf("\n>> ");
-    fflush(stdout);
+  //dynamically stores cwd in string
+  char *cwd = getcwd(NULL, 0);
+  if (cwd == NULL) perror("getcwd error");
+  
+  printf("%s $", cwd);
+  
+  free(cwd);
+  fflush(stdout);
 }
 
 void sighandler(int signo){
@@ -27,34 +36,39 @@ int main(){
   sigemptyset(&sa.sa_mask);
   sigaction(SIGINT, &sa, &old);
   
-  while (1){
+  prompt_print();
+  
+  char line[BUFFER_SIZE];
+  while (fgets(line, BUFFER_SIZE, stdin)){
 
-    
-    prompt_print();
-    //get cmd
-    char line[256];
-    if(fgets(line, 256, stdin)){
-      line[strlen(line) - 1] = 0;
-      char * arg_ary[256];
-      parse_args(line, arg_ary);
+    line[strlen(line) - 1] = 0;//delete newline
+    char *arg_ary[TOKEN_SIZE];
+    parse_args(line, arg_ary);
 
-      // if it was exit stop the program
-      if(!strcmp(arg_ary[0], "exit")){
-        exit(0);
-      }
-
-      // fork
-      if(!fork()){
-        sigaction(SIGINT, &old, NULL);
-        execvp(arg_ary[0], arg_ary);
-      }
-      else{
-        int status;
-        int kidid = wait(&status); //wait for child
-      }
-    }
-    else{ //if EOF exit
+    // if it was exit stop the program
+    if(!strcmp(arg_ary[0], "exit")) {
       exit(0);
     }
+    else if (!strcmp(arg_ary[0], "cd")) {
+      if (chdir(arg_ary[1])) perror("chdir error");
+      else {
+        prompt_print();
+        continue;
+      }
+    }
+
+    //cmd isn't cd or exit
+    // fork
+    if(!fork()){
+      sigaction(SIGINT, &old, NULL);
+      execvp(arg_ary[0], arg_ary);
+    }
+    else{
+      int status;
+      int kid_id = wait(&status); //wait for child
+    }
+    prompt_print();
   }
+  
+  return 0;
 }
