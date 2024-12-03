@@ -8,6 +8,7 @@
 #include <sys/wait.h>
 #include <errno.h>
 
+
 #include "parse.h"
 #include "colors.h"
 #include "shell.h"
@@ -43,8 +44,11 @@ int main(){
   sigemptyset(&sa.sa_mask);
   sigaction(SIGINT, &sa, &old);
   
+
+  int STDIN = dup(fileno(stdin));
+  int STDOUT = dup(fileno(stdout));
+
   prompt_print();
-  redirect_stdout_create_file("test");
   
   char input_buffer[BUFFER_SIZE];
   while (fgets(input_buffer, BUFFER_SIZE, stdin)){
@@ -56,11 +60,22 @@ int main(){
     for(int i = 0; lines_ary[i]; i++){
       char * line = lines_ary[i];
       char * new_line_pos;
-      while (new_line_pos = strchr(line, '\n')){
+      while ( (new_line_pos = strchr(line, '\n')) ){
         *new_line_pos = 0;
       }
+
       char *arg_ary[TOKEN_SIZE];
-      parse_args(line, arg_ary);
+     
+      if(strchr(line, '>')){
+        char * cmd;
+        cmd = strsep(&line, ">");
+        parse_args(cmd, arg_ary);
+        redirect_stdout_create_file(line);
+      }
+      else{
+        parse_args(line, arg_ary);
+      }
+     
 
       //CHECK IF USER ENTERED A SPECIAL CMD
       if(!special_cmd(arg_ary)){
@@ -78,6 +93,7 @@ int main(){
         }
         else{
           int status;
+          reset_fds(STDIN, STDOUT);
           int kid_id = wait(&status); //wait for child
         }
       }
