@@ -12,7 +12,7 @@
 
 
 #define CLEARLINE "\e[2K"
-#define CURSERLEFT "\eC"
+#define CURSERLEFT "\e[<1>A"
 #define CURSERRIGHT "\eD"
 
 #endif

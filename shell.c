@@ -56,7 +56,7 @@ void prompt_print(){
   
 
   printf("\n");
-  printf(GREEN"%s"COLOREND":"BLUE"%s"COLOREND"$", pas->pw_name, cwd);
+  printf(GREEN"%s"COLOREND":"BLUE"%s"COLOREND"$ ", pas->pw_name, cwd);
   fflush(stdout);
   
   free(cwd);
@@ -115,6 +115,7 @@ int main(){
       }
     }
     prompt_print();
+    printf(CURSERRIGHT);
   }
   return 0;
 }
