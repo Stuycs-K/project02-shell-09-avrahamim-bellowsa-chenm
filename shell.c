@@ -1,3 +1,4 @@
+#define _POSIX_C_SOURCE 200809L
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -9,19 +10,11 @@
 
 #include "parse.h"
 #include "colors.h"
+#include "shell.h"
+#include "prompt.h"
+#include "util.h"
 
-#define BUFFER_SIZE 256
-#define TOKEN_SIZE 256
 
-int check_err(int err, char * err_type){
-  if(err == -1){
-    char err_buff[BUFFER_SIZE];
-    sprintf(err_buff, "%s: %s", err_type, strerror(errno));
-    perror(err_buff);
-    return -1;
-  }
-  return 0;
-}
 
 int special_cmd(char ** arg_ary){
   if(!strcmp(arg_ary[0], "exit")) {
@@ -34,20 +27,6 @@ int special_cmd(char ** arg_ary){
   }
  
   return 0;
-}
-
-//print prompt, includes pwd and $
-void prompt_print(){
-  //dynamically stores cwd in string
-  char *cwd = getcwd(NULL, 0);
-  if (cwd == NULL) perror("getcwd error");
-  
-  char * usr = getlogin();
-
-  printf(GREEN"%s"COLOREND":"BLUE"%s"COLOREND"$", usr, cwd);
-  
-  free(cwd);
-  fflush(stdout);
 }
 
 void sighandler(int signo){
