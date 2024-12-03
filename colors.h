@@ -1,3 +1,5 @@
+//Escape codes coppied from https://espterm.github.io/docs/VT100%20escape%20codes.html 
+
 #ifndef COLORS_H
 #define COLORS_H
 
@@ -7,5 +9,10 @@
 #define BLINK "\e[5m"
 #define BLINKEND ""
 #define COLOREND "\e[0m"
+
+
+#define CLEARLINE "\e[2K"
+#define CURSERLEFT "\eC"
+#define CURSERRIGHT "\eD"
 
 #endif
