@@ -69,7 +69,7 @@ int main(){
       if(strchr(line, '>')){
         char * cmd;
         cmd = strsep(&line, " > ");
-        line += 2*sizeof(char);
+        // line += 2*sizeof(char);
         parse_args(cmd, arg_ary);
         printf("line: %s\n", line);
         redirect_stdout_create_file(line);
