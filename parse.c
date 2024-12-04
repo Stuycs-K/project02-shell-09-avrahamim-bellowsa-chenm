@@ -84,18 +84,3 @@ void parse_opps(char * line, char ** opp_seperated_ary, int* size){
   }
 }
 
-int main(){
-  char * test[256];
-  char * line = malloc(sizeof(char)*256);
-  strcpy(line, "a c rbicus<b|c>d");
-  int s = 0;
-  
-  parse_opps(line, test, &s);
-
-  for (int i = 0; i<s; i++){
-    if(test[i]){
-      printf("%s\n", test[i]);
-    }
-  }
-  // parse_opps("gar<d|<|> ", test, 0);
-}
