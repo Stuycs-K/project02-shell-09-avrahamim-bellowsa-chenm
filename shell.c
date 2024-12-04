@@ -1,20 +1,21 @@
-#define _POSIX_C_SOURCE 200809L
+// #define _POSIX_C_SOURCE 200809L
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include <string.h>
 #include <signal.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <errno.h>
 #include <pwd.h>
+#include <string.h>
+
 
 #include "parse.h"
 #include "colors.h"
 #include "shell.h"
 #include "prompt.h"
 #include "util.h"
-
+#include "redirect.h"
 
 
 int special_cmd(char ** arg_ary){
@@ -59,11 +60,15 @@ int main(){
     for(int i = 0; lines_ary[i]; i++){
       char * line = lines_ary[i];
       char * new_line_pos;
-      while (new_line_pos = strchr(line, '\n')){
+      while ( (new_line_pos = strchr(line, '\n')) ){
         *new_line_pos = 0;
       }
+
       char *arg_ary[TOKEN_SIZE];
+      
       parse_args(line, arg_ary);
+      
+
 
       //CHECK IF USER ENTERED A SPECIAL CMD
       if(!special_cmd(arg_ary)){
