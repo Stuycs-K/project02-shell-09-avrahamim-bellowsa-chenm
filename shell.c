@@ -1,12 +1,12 @@
-#define _POSIX_C_SOURCE 200809L
+// #define _POSIX_C_SOURCE 200809L
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include <string.h>
 #include <signal.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <errno.h>
+#include <string.h>
 
 
 #include "parse.h"
@@ -68,8 +68,10 @@ int main(){
      
       if(strchr(line, '>')){
         char * cmd;
-        cmd = strsep(&line, ">");
+        cmd = strsep(&line, " > ");
+        line += 2*sizeof(char);
         parse_args(cmd, arg_ary);
+        printf("line: %s\n", line);
         redirect_stdout_create_file(line);
       }
       else{
