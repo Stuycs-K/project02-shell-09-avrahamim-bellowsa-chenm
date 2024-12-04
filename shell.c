@@ -16,7 +16,7 @@
 #include "prompt.h"
 #include "util.h"
 #include "redirect.h"
-
+#include "run.h"
 
 int special_cmd(char ** arg_ary){
   if(!strcmp(arg_ary[0], "exit")) {
@@ -59,36 +59,9 @@ int main(){
 
     for(int i = 0; lines_ary[i]; i++){
       char * line = lines_ary[i];
-      char * new_line_pos;
-      while ( (new_line_pos = strchr(line, '\n')) ){
-        *new_line_pos = 0;
-      }
-
-      char *arg_ary[TOKEN_SIZE];
+      stripln(line);
       
-      parse_args(line, arg_ary);
-      
-
-
-      //CHECK IF USER ENTERED A SPECIAL CMD
-      if(!special_cmd(arg_ary)){
-
-        //No special cmd -> fork
-        int fork_result = fork();
-        check_err(fork_result, "fork error");
-        if(!fork_result){
-          //child
-          sigaction(SIGINT, &old, NULL);
-          int exec_vp_result = execvp(arg_ary[0], arg_ary);
-          if(check_err(exec_vp_result, "execvp err")){
-            exit(0);
-          }
-        }
-        else{
-          int status;
-          int kid_id = wait(&status); //wait for child
-        }
-      }
+      run_cmd(line, old);
     }
     prompt_print();
   }

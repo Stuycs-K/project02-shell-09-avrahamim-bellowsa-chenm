@@ -19,6 +19,14 @@ int check_err(int err, char * err_type){
   return 0;
 }
 
+void stripln(char * string){
+  char * new_line_pos;
+  //remove \n
+  while ( (new_line_pos = strchr(string, '\n')) ){
+    *new_line_pos = 0;
+  }
+}
+
 // Takes a string and returns a new string minus the character at index i
 char * removeSpace(char * line, char * newLine, int index){
   int j = 0;
