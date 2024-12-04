@@ -26,7 +26,7 @@ int special_cmd(char ** arg_ary){
     check_err(chdir(arg_ary[1]), "chdir error");
     return 1;
   }
- 
+
   return 0;
 }
 
@@ -43,13 +43,13 @@ int main(){
   sa.sa_flags = SA_RESTART;
   sigemptyset(&sa.sa_mask);
   sigaction(SIGINT, &sa, &old);
-  
+
 
   int STDIN = dup(fileno(stdin));
   int STDOUT = dup(fileno(stdout));
 
   prompt_print();
-  
+
   char input_buffer[BUFFER_SIZE];
   while (fgets(input_buffer, BUFFER_SIZE, stdin)){
 
@@ -65,11 +65,13 @@ int main(){
       }
 
       char *arg_ary[TOKEN_SIZE];
-     
+
       if(strchr(line, '>')){
-        char * cmd;
-        cmd = strsep(&line, " > ");
-        line += 2*sizeof(char);
+        char * tempcmd;
+        tempcmd = strsep(&line, ">");
+        char cmd[strlen(tempcmd) - 1];
+        removeSpace(tempcmd, cmd, strlen(tempcmd) - 1);
+        printf("command: %s\n", cmd);
         parse_args(cmd, arg_ary);
         printf("line: %s\n", line);
         redirect_stdout_create_file(line);
@@ -77,7 +79,7 @@ int main(){
       else{
         parse_args(line, arg_ary);
       }
-     
+
 
       //CHECK IF USER ENTERED A SPECIAL CMD
       if(!special_cmd(arg_ary)){
