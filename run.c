@@ -12,6 +12,62 @@
 #include "parse.h"
 #include "util.h"
 #include "shell.h"
+#include "redirect.h"
+
+#define MAXOPPS 100
+// void flow_execution(char * in_line){
+//     char * chunks[MAXOPPS];
+//     char * line = malloc(sizeof(char)*strlen(line));
+//     strcpy(line, in_line);
+//     int size = 0;
+    
+//     parse_opps(line, chunks, &size);
+
+    
+  
+// }
+
+void flow_execution(char ** chunks, int index, int size, struct sigaction old){
+  if(size == 1){
+    run_cmd(chunks[index], old);
+  }
+  //A a B b C
+
+  // char * A = chunks[index];
+  // char * a = chunks[index+1];
+  // char * B = chunks[index+2];
+  // char * b = chunks[index+3];
+  // char * C = chunks[index+4];
+
+  if(index != 0){
+    if(!strcmp(chunks[index-1], "|")){ //if this block is coming out of a pipe, set stdin to temp
+      redirect_stdin_create_file("temp");
+    }
+
+    if(!strcmp(chunks[index+1], ">")){
+      redirect_stdout_create_file(chunks[index+2]);
+      run_cmd(chunks[index], old);
+    }
+
+    if(!strcmp(chunks[index+1], "<")){
+      redirect_stdin_create_file(chunks[index+2]);
+
+      if(!strcmp(chunks[index+3], "|")){
+        redirect_stdout_create_file("temp");
+        run_cmd(chunks[index], old);
+        flow_execution(chunks, index+4, size-4, old);
+      }
+
+      if(!strcmp(chunks[index+3], ">")){
+        redirect_stdout_create_file(chunks[index+4]);
+        run_cmd(chunks[index], old);
+      }
+
+    }
+
+
+  }
+}
 
 int run_cmd(char * cmd_block, struct sigaction old){
        char *arg_ary[TOKEN_SIZE];
@@ -34,6 +90,7 @@ int run_cmd(char * cmd_block, struct sigaction old){
         }
         else{
           int status;
+          reset_fds(0,1);
           int kid_id = wait(&status); //wait for child
         }
       }

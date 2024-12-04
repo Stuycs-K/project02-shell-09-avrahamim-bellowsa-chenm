@@ -18,6 +18,8 @@
 #include "redirect.h"
 #include "run.h"
 
+#define MAXOPPS 256
+
 int special_cmd(char ** arg_ary){
   if(!strcmp(arg_ary[0], "exit")) {
     exit(0);
@@ -61,7 +63,16 @@ int main(){
       char * line = lines_ary[i];
       stripln(line);
       
-      run_cmd(line, old);
+      char * chunks[MAXOPPS];
+      char * myline = malloc(sizeof(char)*strlen(line));
+      strcpy(myline, line);
+      int size = 0;
+      
+      parse_opps(myline, chunks, &size);
+      printf("chunk size: %d\n", size);
+
+      flow_execution(chunks,0,size,old);
+      // run_cmd(line, old);
     }
     prompt_print();
   }
