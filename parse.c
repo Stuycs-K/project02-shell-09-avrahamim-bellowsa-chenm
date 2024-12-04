@@ -25,33 +25,77 @@ void parse_lines(char * input, char ** line_ary){
   line_ary[i] = NULL;
 }
 
-void parse_opps(char * line, char ** opp_seperated_ary){
+
+int min(int * intv, int s){
+  int min_index = 0;
+  for(int i = 1; i<s; i++){
+    if(intv[i]<intv[min_index]){
+      min_index = i;
+    }
+  }
+  return min_index;
+}
+
+void sep_on_first_char(char * line, char * sep_on){ //sep_on must be malloced!!
   //goal is to sep on <, >, |
   // a < b | c > d -> {a,<,b,|,c,>,d}
 
-
-  char * greater_char = ">";
-  char * less_char = "<";
-  char * pipe_char = "|";
-
   char * symbolv[3];
-  symbolv[0] = greater_char;
-  symbolv[1] = less_char;
-  symbolv[2] = pipe_char;
+  symbolv[0] = ">";
+  symbolv[1] = "<";
+  symbolv[2] = "|";
 
-  unsigned int line_start = (unsigned int) line;
+  int lengths[3];
+  for(int i = 0; i<3; i++){
+    char * mv_line = malloc(strlen(line)*sizeof(char));
+    strcpy(mv_line, line);
+    char * token = strsep(&mv_line, symbolv[i]);
+    lengths[i] = strlen(token);
+    free(token);
+  }
 
-  unsigned int first_greater = ( unsigned int ) strchrnul(line,'>') - line_start;
-  unsigned int first_less = ( unsigned int ) strchrnul(line, '<') - line_start;
-  unsigned int first_pipe = ( unsigned int ) strchrnul(line, '|') - line_start;
+  if(lengths[0] == lengths[1] && lengths[1] == lengths[2]){ // no sep occured
+    return;
+  }
 
-  char * start = NULL;
+  int min_length = min(lengths,3);
 
+  strcpy(sep_on,symbolv[min_length]);
+}
 
-  printf("%d,  >: %u, <: %u, |: %u\n", strlen(line), first_greater, first_less, first_pipe);
+void parse_opps(char * line, char ** opp_seperated_ary, int* size){
+  int s = *size;
+  char * sep_on = malloc(sizeof(char));
 
+  sep_on_first_char(line, sep_on);
+
+  char * token = strsep(&line, sep_on);
+
+  opp_seperated_ary[s] = token;
+  s++;
+  opp_seperated_ary[s] = malloc(sizeof(char));
+  strcpy(opp_seperated_ary[s], sep_on);
+  s++;
+
+  *size = s;
+  if(line){
+    printf("LINE: %s\n", line);
+    parse_opps(line, opp_seperated_ary,size);
+  }
 }
 
 int main(){
-  parse_opps("|  ", NULL);
+  char * test[256];
+  char * line = malloc(sizeof(char)*256);
+  strcpy(line, "a c rbicus<b|c>d");
+  int s = 0;
+  
+  parse_opps(line, test, &s);
+
+  for (int i = 0; i<s; i++){
+    if(test[i]){
+      printf("%s\n", test[i]);
+    }
+  }
+  // parse_opps("gar<d|<|> ", test, 0);
 }
