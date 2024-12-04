@@ -86,7 +86,6 @@ int main(){
       }
     }
     prompt_print();
-    printf(CURSERRIGHT);
   }
   return 0;
 }
