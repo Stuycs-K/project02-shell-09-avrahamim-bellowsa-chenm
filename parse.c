@@ -7,6 +7,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <errno.h>
+#include "util.h"
 
 void parse_args( char * line, char ** arg_ary ){
   int argIndex = 0;
@@ -71,6 +72,19 @@ void parse_opps(char * line, char ** opp_seperated_ary, int* size){
   sep_on_first_char(line, sep_on);
 
   char * token = strsep(&line, sep_on);
+  if (*(token) == ' '){
+    char temptoken[strlen(token) - 1];
+    removeSpace(token, temptoken, 0);
+    strcpy(token, temptoken);
+  }
+  if (*(token + strlen(token) - 1) == ' '){
+    char temptoken[strlen(token) - 1];
+    removeSpace(token, temptoken, strlen(token) - 1);
+    strcpy(token, temptoken);
+  }
+  // for (int i = 0; i < strlen(token); i++){
+  //   printf("%c\n", *(token + i));
+  // }
 
   opp_seperated_ary[s] = malloc(sizeof(char)*strlen(token));
   strcpy(opp_seperated_ary[s], token);
@@ -83,4 +97,3 @@ void parse_opps(char * line, char ** opp_seperated_ary, int* size){
     parse_opps(line, opp_seperated_ary,size);
   }
 }
-
