@@ -20,11 +20,11 @@
 //     char * line = malloc(sizeof(char)*strlen(line));
 //     strcpy(line, in_line);
 //     int size = 0;
-    
+
 //     parse_opps(line, chunks, &size);
 
-    
-  
+
+
 // }
 
 void flow_execution(char ** chunks, int index, int size, struct sigaction old){
@@ -49,9 +49,9 @@ void flow_execution(char ** chunks, int index, int size, struct sigaction old){
     }
   }
   if(!strcmp(chunks[index+1], ">")){
-    printf("redirecting stdout to ... > %s\n", chunks[index+2]);
-    redirect_stdout_create_file(chunks[index+2]);
+    int old_stdout = redirect_stdout_create_file(chunks[index+2]);
     run_cmd(chunks[index], old);
+    reset_fds(fileno(stdin), old_stdout);
   }
 
   if(!strcmp(chunks[index+1], "<")){
@@ -71,7 +71,7 @@ void flow_execution(char ** chunks, int index, int size, struct sigaction old){
       run_cmd(chunks[index], old);
     }
 
-    
+
 
 
   }
@@ -81,9 +81,9 @@ int run_cmd(char * cmd_block, struct sigaction old){
 
   printf("cmd: %s\n", cmd_block);
   char *arg_ary[TOKEN_SIZE];
-  
+
   parse_args(cmd_block, arg_ary);
-  
+
   //CHECK IF USER ENTERED A SPECIAL CMD
   if(!special_cmd(arg_ary)){
 
@@ -100,7 +100,6 @@ int run_cmd(char * cmd_block, struct sigaction old){
     }
     else{
       int status;
-      reset_fds(0,1);
       int kid_id = wait(&status); //wait for child
     }
   }
