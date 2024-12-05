@@ -28,9 +28,7 @@
 // }
 
 void flow_execution(char ** chunks, int index, int size, struct sigaction old){
-  for(int i = 0; i<size; i++){
-    printf("%s\n", chunks[i]);
-  }
+
   if(size <= 2){
     run_cmd(chunks[index], old);
   }
@@ -84,7 +82,6 @@ void flow_execution(char ** chunks, int index, int size, struct sigaction old){
 
 int run_cmd(char * cmd_block, struct sigaction old){
 
-  printf("cmd: %s\n", cmd_block);
   char *arg_ary[TOKEN_SIZE];
 
   parse_args(cmd_block, arg_ary);
