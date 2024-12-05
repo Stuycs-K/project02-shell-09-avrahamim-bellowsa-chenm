@@ -30,7 +30,6 @@ int redirect_stdout_create_file(char * name){
 int redirect_stdin(int fd){
     int stdfileno = fileno(stdin);
     int old_stdin = dup(stdfileno);
-    dup2(fd, stdfileno);
     check_err(dup2(fd, stdfileno), "dup2 err");
     return old_stdin;
 }
@@ -44,11 +43,7 @@ int redirect_stdin_create_file(char * name){
 void reset_fds(int old_stdin, int old_stdout){
     int stdinno = fileno(stdin);
     int stdoutno = fileno(stdout);
-    printf("STD: %d\n", fileno(stdout));
 
     dup2(old_stdin, stdinno);
     dup2(old_stdout, stdoutno);
-
-    printf("STD: %d\n", fileno(stdout));
-
 }

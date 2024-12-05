@@ -42,10 +42,11 @@ void flow_execution(char ** chunks, int index, int size, struct sigaction old){
   // char * b = chunks[index+3];
   // char * C = chunks[index+4];
 
+  int old_stdin = fileno(stdin);
   if(index != 0){
     if(!strcmp(chunks[index-1], "|")){ //if this block is coming out of a pipe, set stdin to temp
       printf("Prev was | -> stdin=temp\n");
-      redirect_stdin_create_file("temp");
+      old_stdin = redirect_stdin_create_file("temp");
     }
   }
   if(!strcmp(chunks[index+1], ">")){
@@ -57,19 +58,23 @@ void flow_execution(char ** chunks, int index, int size, struct sigaction old){
   if(!strcmp(chunks[index+1], "<")){
     printf("redirecting stdin to... > %s\n", chunks[index+2]);
     redirect_stdin_create_file(chunks[index+2]);
-
-    if(!strcmp(chunks[index+3], "|")){
-      printf("redirecting stdout to... > %s\n", "temp");
-      redirect_stdout_create_file("temp");
-      run_cmd(chunks[index], old);
-      flow_execution(chunks, index+4, size-4, old);
+    if (size > index + 3){
+      if(!strcmp(chunks[index+3], "|")){
+        printf("redirecting stdout to... > %s\n", "temp");
+        redirect_stdout_create_file("temp");
+        run_cmd(chunks[index], old);
+        flow_execution(chunks, index+4, size-4, old);
+      }
+      if(!strcmp(chunks[index+3], ">")){
+        printf("redirecting stdout to... > %s\n", chunks[index+4]);
+        redirect_stdout_create_file(chunks[index+4]);
+        run_cmd(chunks[index], old);
+      }
     }
 
-    if(!strcmp(chunks[index+3], ">")){
-      printf("redirecting stdout to... > %s\n", chunks[index+4]);
-      redirect_stdout_create_file(chunks[index+4]);
-      run_cmd(chunks[index], old);
-    }
+
+
+
 
 
 
