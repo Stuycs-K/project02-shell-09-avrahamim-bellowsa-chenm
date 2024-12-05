@@ -28,7 +28,10 @@
 // }
 
 void flow_execution(char ** chunks, int index, int size, struct sigaction old){
-  if(size == 1){
+  for(int i = 0; i<size; i++){
+    printf("%s\n", chunks[i]);
+  }
+  if(size <= 2){
     run_cmd(chunks[index], old);
   }
   //A a B b C
@@ -41,57 +44,61 @@ void flow_execution(char ** chunks, int index, int size, struct sigaction old){
 
   if(index != 0){
     if(!strcmp(chunks[index-1], "|")){ //if this block is coming out of a pipe, set stdin to temp
+      printf("Prev was | -> stdin=temp\n");
       redirect_stdin_create_file("temp");
     }
+  }
+  if(!strcmp(chunks[index+1], ">")){
+    printf("redirecting... > %s\n", chunks[index+2]);
+    redirect_stdout_create_file(chunks[index+2]);
+    run_cmd(chunks[index], old);
+  }
 
-    if(!strcmp(chunks[index+1], ">")){
-      redirect_stdout_create_file(chunks[index+2]);
+  if(!strcmp(chunks[index+1], "<")){
+    redirect_stdin_create_file(chunks[index+2]);
+
+    if(!strcmp(chunks[index+3], "|")){
+      redirect_stdout_create_file("temp");
+      run_cmd(chunks[index], old);
+      flow_execution(chunks, index+4, size-4, old);
+    }
+
+    if(!strcmp(chunks[index+3], ">")){
+      redirect_stdout_create_file(chunks[index+4]);
       run_cmd(chunks[index], old);
     }
 
-    if(!strcmp(chunks[index+1], "<")){
-      redirect_stdin_create_file(chunks[index+2]);
-
-      if(!strcmp(chunks[index+3], "|")){
-        redirect_stdout_create_file("temp");
-        run_cmd(chunks[index], old);
-        flow_execution(chunks, index+4, size-4, old);
-      }
-
-      if(!strcmp(chunks[index+3], ">")){
-        redirect_stdout_create_file(chunks[index+4]);
-        run_cmd(chunks[index], old);
-      }
-
-    }
+    
 
 
   }
 }
 
 int run_cmd(char * cmd_block, struct sigaction old){
-       char *arg_ary[TOKEN_SIZE];
-      
-      parse_args(cmd_block, arg_ary);
-      
-      //CHECK IF USER ENTERED A SPECIAL CMD
-      if(!special_cmd(arg_ary)){
 
-        //No special cmd -> fork
-        int fork_result = fork();
-        check_err(fork_result, "fork error");
-        if(!fork_result){
-          //child
-          sigaction(SIGINT, &old, NULL);
-          int exec_vp_result = execvp(arg_ary[0], arg_ary);
-          if(check_err(exec_vp_result, "execvp err")){
-            exit(0);
-          }
-        }
-        else{
-          int status;
-          reset_fds(0,1);
-          int kid_id = wait(&status); //wait for child
-        }
+  printf("cmd: %s\n", cmd_block);
+  char *arg_ary[TOKEN_SIZE];
+  
+  parse_args(cmd_block, arg_ary);
+  
+  //CHECK IF USER ENTERED A SPECIAL CMD
+  if(!special_cmd(arg_ary)){
+
+    //No special cmd -> fork
+    int fork_result = fork();
+    check_err(fork_result, "fork error");
+    if(!fork_result){
+      //child
+      sigaction(SIGINT, &old, NULL);
+      int exec_vp_result = execvp(arg_ary[0], arg_ary);
+      if(check_err(exec_vp_result, "execvp err")){
+        exit(0);
       }
+    }
+    else{
+      int status;
+      reset_fds(0,1);
+      int kid_id = wait(&status); //wait for child
+    }
+  }
 }

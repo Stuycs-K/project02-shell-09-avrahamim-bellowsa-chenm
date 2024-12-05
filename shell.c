@@ -67,9 +67,8 @@ int main(){
       char * myline = malloc(sizeof(char)*strlen(line));
       strcpy(myline, line);
       int size = 0;
-      
       parse_opps(myline, chunks, &size);
-      printf("chunk size: %d\n", size);
+   
 
       flow_execution(chunks,0,size,old);
       // run_cmd(line, old);

@@ -55,6 +55,7 @@ void sep_on_first_char(char * line, char * sep_on){ //sep_on must be malloced!!
   }
 
   if(lengths[0] == lengths[1] && lengths[1] == lengths[2]){ // no sep occured
+    strcpy(sep_on,"");
     return;
   }
 
@@ -71,15 +72,14 @@ void parse_opps(char * line, char ** opp_seperated_ary, int* size){
 
   char * token = strsep(&line, sep_on);
 
-  opp_seperated_ary[s] = token;
+  opp_seperated_ary[s] = malloc(sizeof(char)*strlen(token));
+  strcpy(opp_seperated_ary[s], token);
   s++;
-  opp_seperated_ary[s] = malloc(sizeof(char));
-  strcpy(opp_seperated_ary[s], sep_on);
+  opp_seperated_ary[s] = sep_on;
   s++;
 
   *size = s;
-  if(line){
-    printf("LINE: %s\n", line);
+  if(line && strcmp(line, "")){
     parse_opps(line, opp_seperated_ary,size);
   }
 }
