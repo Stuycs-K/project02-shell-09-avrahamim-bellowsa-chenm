@@ -62,16 +62,15 @@ int main(){
     for(int i = 0; lines_ary[i]; i++){
       char * line = lines_ary[i];
       stripln(line);
-      
+
       char * chunks[MAXOPPS];
       char * myline = malloc(sizeof(char)*strlen(line));
       strcpy(myline, line);
       int size = 0;
       parse_opps(myline, chunks, &size);
-   
+
 
       flow_execution(chunks,0,size,old);
-      // run_cmd(line, old);
     }
     prompt_print();
   }
