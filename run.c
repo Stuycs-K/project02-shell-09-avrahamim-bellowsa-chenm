@@ -135,9 +135,9 @@
         sigaction(SIGINT, &old, NULL);
         //printf("arg_ary[0]: %s\n", arg_ary[0]);
         int exec_vp_result = execvp(arg_ary[0], arg_ary);
-        if(check_err(exec_vp_result, "execvp err")){
-          exit(0);
-        }
+        // if(check_err(exec_vp_result, "execvp err")){
+        //   exit(0);
+        // }
         //printf("something good happened\n");
       }
       else{
