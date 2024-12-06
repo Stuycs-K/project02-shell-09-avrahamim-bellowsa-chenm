@@ -29,6 +29,9 @@
 
 void flow_execution(char ** chunks, int index, int size, struct sigaction old){
 
+  for (int i = 0; i < size; i++){
+    printf("[%s]\n", *(chunks+i));
+  }
   if(size <= 2){
     run_cmd(chunks[index], old);
   }
@@ -55,44 +58,55 @@ void flow_execution(char ** chunks, int index, int size, struct sigaction old){
   }
 
   if (!strcmp(chunks[index+1], "|")){
-    if (size <= index + 3){
-      printf("redirecting stdout to... > temp\n");
-      int old_stdout = redirect_stdout_create_file("temp");
-      run_cmd(chunks[index], old);
-      reset_stdout(old_stdout);
+    //printf("redirecting stdout to... > temp\n");
+    old_stdout = redirect_stdout_create_file("temp");
+    run_cmd(chunks[index], old);
+    reset_stdout(old_stdout);
 
-      printf("redirecting stdin to... > temp\n");
-      old_stdin = redirect_stdin_create_file("temp");
-      run_cmd(chunks[index+2], old);
-      reset_stdin(old_stdin);
+    //printf("redirecting stdin to... > temp\n");
+    old_stdin = redirect_stdin_create_file("temp");
+
+    if (size > index + 3){
+      //printf("redirecting stdout2 to...> %s\n", chunks[index+4]);
+      old_stdout = redirect_stdout_create_file(chunks[index+4]);
     }
+    run_cmd(chunks[index+2], old);
+    reset_stdout(old_stdout);
+    reset_stdin(old_stdin);
+
   }
 
   //printf("so you get here?\n");
 
   fflush(stdout);
   if(!strcmp(chunks[index+1], "<")){
-    printf("redirecting stdin to... > %s\n", chunks[index+2]);
+    //printf("redirecting stdin to... > %s\n", chunks[index+2]);
     old_stdin = redirect_stdin_create_file(chunks[index + 2]);
-
-    if (size <= index + 3){
-      run_cmd(chunks[index], old);
-      reset_stdin(old_stdin);
+    if (size > index + 3){
+      if (!strcmp(chunks[index+3], "|")){
+        //printf("redirecting stdout to... > temp\n");
+        old_stdout = redirect_stdout_create_file("temp");
+      }
+      if (!strcmp(chunks[index+3], ">")){
+        //printf("redirecting stdout to... > %s\n", chunks[index + 4]);
+        old_stdout = redirect_stdout_create_file(chunks[index + 4]);
+      }
     }
-    else {
-      if(!strcmp(chunks[index+3], "|")){
-        printf("redirecting stdout to... > %s\n", "temp");
-        redirect_stdout_create_file("temp");
-        run_cmd(chunks[index], old);
-        flow_execution(chunks, index+4, size-4, old);
+    run_cmd(chunks[index], old);
+    reset_stdin(old_stdin);
+    reset_stdout(old_stdout);
+
+    if (!strcmp(chunks[index+3], "|")){
+      //printf("redirecting stdin to... > temp\n");
+      old_stdin = redirect_stdin_create_file("temp");
+
+      if (size > index + 5){
+        //printf("redirecting stdout2 to...> %s\n", chunks[index+6]);
+        old_stdout = redirect_stdout_create_file(chunks[index+6]);
       }
-      if(!strcmp(chunks[index+3], ">")){
-        printf("redirecting stdout to... > %s\n", chunks[index+4]);
-        old_stdout = redirect_stdout_create_file(chunks[index+4]);
-        run_cmd(chunks[index], old);
-        reset_stdin(old_stdin);
-        reset_stdout(old_stdout);
-      }
+      run_cmd(chunks[index+4], old);
+      reset_stdout(old_stdout);
+      reset_stdin(old_stdin);
     }
   }
 
@@ -127,7 +141,7 @@ int run_cmd(char * cmd_block, struct sigaction old){
     }
     else{
       int status;
-      int kid_id = wait(&status); //wait for child
+      wait(&status); //wait for child
     }
   }
   return 0;

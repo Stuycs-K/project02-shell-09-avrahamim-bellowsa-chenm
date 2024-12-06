@@ -42,15 +42,11 @@ int redirect_stdin_create_file(char * name){
 
 void reset_stdin(int old_stdin){
     int stdinno = fileno(stdin);
-
-    printf("stdins: %d %d", stdinno, old_stdin);
     dup2(old_stdin, stdinno);
 
 }
 
 void reset_stdout(int old_stdout){
   int stdoutno = fileno(stdout);
-
-  printf("stdouts: %d %d", stdoutno, old_stdout);
   dup2(old_stdout, stdoutno);
 }
