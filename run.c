@@ -41,6 +41,7 @@ void flow_execution(char ** chunks, int index, int size, struct sigaction old){
   // char * C = chunks[index+4];
 
   int old_stdin = fileno(stdin);
+  int old_stdout = fileno(stdout);
   // if(index != 0){
   //   if(!strcmp(chunks[index-1], "|")){ //if this block is coming out of a pipe, set stdin to temp
   //     printf("Prev was | -> stdin=temp\n");
@@ -48,7 +49,7 @@ void flow_execution(char ** chunks, int index, int size, struct sigaction old){
   //   }
   // }
   if(!strcmp(chunks[index+1], ">")){
-    int old_stdout = redirect_stdout_create_file(chunks[index+2]);
+    old_stdout = redirect_stdout_create_file(chunks[index+2]);
     run_cmd(chunks[index], old);
     reset_stdout(old_stdout);
   }
@@ -87,8 +88,10 @@ void flow_execution(char ** chunks, int index, int size, struct sigaction old){
       }
       if(!strcmp(chunks[index+3], ">")){
         printf("redirecting stdout to... > %s\n", chunks[index+4]);
-        redirect_stdout_create_file(chunks[index+4]);
+        old_stdout = redirect_stdout_create_file(chunks[index+4]);
         run_cmd(chunks[index], old);
+        reset_stdin(old_stdin);
+        reset_stdout(old_stdout);
       }
     }
   }
@@ -101,6 +104,10 @@ int run_cmd(char * cmd_block, struct sigaction old){
   char *arg_ary[TOKEN_SIZE];
 
   parse_args(cmd_block, arg_ary);
+
+  // for (int i = 0; i < size; i++){
+  //   printf("%d: [%s]\n", i, *(arg_ary + i));
+  // }
 
   //CHECK IF USER ENTERED A SPECIAL CMD
   if(!special_cmd(arg_ary)){
@@ -116,6 +123,7 @@ int run_cmd(char * cmd_block, struct sigaction old){
       if(check_err(exec_vp_result, "execvp err")){
         exit(0);
       }
+      //printf("something good happened\n");
     }
     else{
       int status;
