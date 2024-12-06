@@ -74,9 +74,9 @@ int main(){
 
       flow_execution(chunks,0,size,old);
       free(myline);
-      for (int i = 0; i < size; i++){
-        free(chunks[i]);
-      }
+      // for (int i = 0; i < size; i++){
+      //   free(chunks[i]);
+      // }
     }
     prompt_print();
   }

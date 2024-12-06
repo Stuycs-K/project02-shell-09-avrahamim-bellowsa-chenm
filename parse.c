@@ -94,7 +94,7 @@ void parse_opps(char * line, char ** opp_seperated_ary, int* size){
   s++;
 
   *size = s;
-  free(sep_on);
+  //free(sep_on);
   if(line && strcmp(line, "")){
     parse_opps(line, opp_seperated_ary,size);
   }
