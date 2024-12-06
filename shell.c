@@ -68,6 +68,7 @@ int main(){
       strcpy(myline, line);
       int size = 0;
       parse_opps(myline, chunks, &size);
+      size--;
 
 
       flow_execution(chunks,0,size,old);

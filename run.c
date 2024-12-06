@@ -53,31 +53,33 @@ void flow_execution(char ** chunks, int index, int size, struct sigaction old){
     reset_fds(fileno(stdin), old_stdout);
   }
 
+  fflush(stdout);
   if(!strcmp(chunks[index+1], "<")){
     printf("redirecting stdin to... > %s\n", chunks[index+2]);
-    redirect_stdin_create_file(chunks[index+2]);
-    if (size > index + 3){
-      if(!strcmp(chunks[index+3], "|")){
-        printf("redirecting stdout to... > %s\n", "temp");
-        redirect_stdout_create_file("temp");
-        run_cmd(chunks[index], old);
-        flow_execution(chunks, index+4, size-4, old);
-      }
-      if(!strcmp(chunks[index+3], ">")){
-        printf("redirecting stdout to... > %s\n", chunks[index+4]);
-        redirect_stdout_create_file(chunks[index+4]);
-        run_cmd(chunks[index], old);
+    if (size <= index + 3){
+      old_stdin = redirect_stdin_create_file(chunks[index + 2]);
+      run_cmd(chunks[index], old);
+      reset_fds(fileno(stdin), old_stdin);
+    }
+    else {
+      redirect_stdin_create_file(chunks[index+2]);
+      if (size > index + 3){
+        if(!strcmp(chunks[index+3], "|")){
+          printf("redirecting stdout to... > %s\n", "temp");
+          redirect_stdout_create_file("temp");
+          run_cmd(chunks[index], old);
+          flow_execution(chunks, index+4, size-4, old);
+        }
+        if(!strcmp(chunks[index+3], ">")){
+          printf("redirecting stdout to... > %s\n", chunks[index+4]);
+          redirect_stdout_create_file(chunks[index+4]);
+          run_cmd(chunks[index], old);
+        }
       }
     }
-
-
-
-
-
-
-
-
   }
+
+
 }
 
 int run_cmd(char * cmd_block, struct sigaction old){
@@ -95,6 +97,7 @@ int run_cmd(char * cmd_block, struct sigaction old){
     if(!fork_result){
       //child
       sigaction(SIGINT, &old, NULL);
+      printf("arg_ary[0]: %s\n", arg_ary[0]);
       int exec_vp_result = execvp(arg_ary[0], arg_ary);
       if(check_err(exec_vp_result, "execvp err")){
         exit(0);
@@ -105,4 +108,5 @@ int run_cmd(char * cmd_block, struct sigaction old){
       int kid_id = wait(&status); //wait for child
     }
   }
+  return 0;
 }
