@@ -40,10 +40,13 @@ int redirect_stdin_create_file(char * name){
 }
 
 
-void reset_fds(int old_stdin, int old_stdout){
+void reset_stdin(int old_stdin){
     int stdinno = fileno(stdin);
-    int stdoutno = fileno(stdout);
-
     dup2(old_stdin, stdinno);
-    dup2(old_stdout, stdoutno);
+
+}
+
+void reset_stdout(int old_stdout){
+  int stdoutno = fileno(stdout);
+  dup2(old_stdout, stdoutno);
 }

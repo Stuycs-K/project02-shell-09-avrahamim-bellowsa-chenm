@@ -64,6 +64,7 @@ int main(){
       stripln(line);
 
       char * chunks[MAXOPPS];
+
       char * myline = malloc(sizeof(char)*strlen(line));
       strcpy(myline, line);
       int size = 0;

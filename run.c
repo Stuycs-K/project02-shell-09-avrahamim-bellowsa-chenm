@@ -41,40 +41,54 @@ void flow_execution(char ** chunks, int index, int size, struct sigaction old){
   // char * C = chunks[index+4];
 
   int old_stdin = fileno(stdin);
-  if(index != 0){
-    if(!strcmp(chunks[index-1], "|")){ //if this block is coming out of a pipe, set stdin to temp
-      printf("Prev was | -> stdin=temp\n");
-      old_stdin = redirect_stdin_create_file("temp");
-    }
-  }
+  // if(index != 0){
+  //   if(!strcmp(chunks[index-1], "|")){ //if this block is coming out of a pipe, set stdin to temp
+  //     printf("Prev was | -> stdin=temp\n");
+  //     old_stdin = redirect_stdin_create_file("temp");
+  //   }
+  // }
   if(!strcmp(chunks[index+1], ">")){
     int old_stdout = redirect_stdout_create_file(chunks[index+2]);
     run_cmd(chunks[index], old);
-    reset_fds(fileno(stdin), old_stdout);
+    reset_stdout(old_stdout);
   }
+
+  if (!strcmp(chunks[index+1], "|")){
+    if (size <= index + 3){
+      printf("redirecting stdout to... > temp\n");
+      int old_stdout = redirect_stdout_create_file("temp");
+      run_cmd(chunks[index], old);
+      reset_stdout(old_stdout);
+
+      printf("redirecting stdin to... > temp\n");
+      old_stdin = redirect_stdin_create_file("temp");
+      run_cmd(chunks[index+2], old);
+      reset_stdin(old_stdin);
+    }
+  }
+
+  //printf("so you get here?\n");
 
   fflush(stdout);
   if(!strcmp(chunks[index+1], "<")){
     printf("redirecting stdin to... > %s\n", chunks[index+2]);
+    old_stdin = redirect_stdin_create_file(chunks[index + 2]);
+
     if (size <= index + 3){
-      old_stdin = redirect_stdin_create_file(chunks[index + 2]);
       run_cmd(chunks[index], old);
-      reset_fds(fileno(stdin), old_stdin);
+      reset_stdin(old_stdin);
     }
     else {
-      redirect_stdin_create_file(chunks[index+2]);
-      if (size > index + 3){
-        if(!strcmp(chunks[index+3], "|")){
-          printf("redirecting stdout to... > %s\n", "temp");
-          redirect_stdout_create_file("temp");
-          run_cmd(chunks[index], old);
-          flow_execution(chunks, index+4, size-4, old);
-        }
-        if(!strcmp(chunks[index+3], ">")){
-          printf("redirecting stdout to... > %s\n", chunks[index+4]);
-          redirect_stdout_create_file(chunks[index+4]);
-          run_cmd(chunks[index], old);
-        }
+      if(!strcmp(chunks[index+3], "|")){
+        printf("redirecting stdout to... > %s\n", "temp");
+        redirect_stdout_create_file("temp");
+        run_cmd(chunks[index], old);
+        flow_execution(chunks, index+4, size-4, old);
+      }
+      if(!strcmp(chunks[index+3], ">")){
+        printf("redirecting stdout to... > %s\n", chunks[index+4]);
+        redirect_stdout_create_file(chunks[index+4]);
+        run_cmd(chunks[index], old);
       }
     }
   }
@@ -97,7 +111,7 @@ int run_cmd(char * cmd_block, struct sigaction old){
     if(!fork_result){
       //child
       sigaction(SIGINT, &old, NULL);
-      printf("arg_ary[0]: %s\n", arg_ary[0]);
+      //printf("arg_ary[0]: %s\n", arg_ary[0]);
       int exec_vp_result = execvp(arg_ary[0], arg_ary);
       if(check_err(exec_vp_result, "execvp err")){
         exit(0);
