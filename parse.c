@@ -38,6 +38,7 @@ int min(int * intv, int s){
   return min_index;
 }
 
+// Takes line and looks for the first instance of < | or >, then puts that in sep_on
 void sep_on_first_char(char * line, char * sep_on){ //sep_on must be malloced!!
   //goal is to sep on <, >, |
   // a < b | c > d -> {a,<,b,|,c,>,d}
@@ -49,11 +50,14 @@ void sep_on_first_char(char * line, char * sep_on){ //sep_on must be malloced!!
 
   int lengths[3];
   for(int i = 0; i<3; i++){
-    char * mv_line = malloc(strlen(line)*sizeof(char));
-    strcpy(mv_line, line);
-    char * token = strsep(&mv_line, symbolv[i]);
-    lengths[i] = strlen(token);
-    free(token);
+    char * ptr = strstr(line, symbolv[i]);
+    if (ptr == 0){
+      lengths[i] = 255;//placeholder to not be minimum
+    }
+    else {
+      lengths[i] = ptr - line;
+    }
+    //printf("%s: %d\n", symbolv[i], lengths[i]);
   }
 
   if(lengths[0] == lengths[1] && lengths[1] == lengths[2]){ // no sep occured
@@ -68,7 +72,10 @@ void sep_on_first_char(char * line, char * sep_on){ //sep_on must be malloced!!
 
 void parse_opps(char * line, char ** opp_seperated_ary, int* size){
   int s = *size;
-  char * sep_on = malloc(sizeof(char));
+  //printf("hi\n");
+  char * sep_on = malloc(4);
+
+  //printf("hello\n");
 
   sep_on_first_char(line, sep_on);
 
@@ -87,6 +94,7 @@ void parse_opps(char * line, char ** opp_seperated_ary, int* size){
   //   printf("%c\n", *(token + i));
   // }
 
+  //opp_seperated_ary[s] = token;
   opp_seperated_ary[s] = malloc(sizeof(char)*strlen(token));
   strcpy(opp_seperated_ary[s], token);
   s++;
@@ -94,8 +102,8 @@ void parse_opps(char * line, char ** opp_seperated_ary, int* size){
   s++;
 
   *size = s;
-  //free(sep_on);
   if(line && strcmp(line, "")){
     parse_opps(line, opp_seperated_ary,size);
   }
+  //free(sep_on);
 }
