@@ -38,6 +38,7 @@ int min(int * intv, int s){
   return min_index;
 }
 
+// Takes line and looks for the first instance of < | or >, then puts that in sep_on
 void sep_on_first_char(char * line, char * sep_on){ //sep_on must be malloced!!
   //goal is to sep on <, >, |
   // a < b | c > d -> {a,<,b,|,c,>,d}
