@@ -62,7 +62,7 @@ int main(){
 
   char input_buffer[BUFFER_SIZE];
   while (1){
-    fill_input_buffer(input_buffer, &original);
+    fill_input_buffer(input_buffer);
     
     //fprintf(stderr, "%s\n", input_buffer);
     //fprintf(stderr, "%d\n", strcmp(input_buffer, "exit"));

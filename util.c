@@ -6,6 +6,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <errno.h>
+#include <termios.h>
 #include "shell.h"
 #include "util.h"
 #include "history.h"
@@ -43,8 +44,10 @@ char * removeSpace(char * line, char * newLine, int index){
   return newLine;
 }
 
+extern struct termios original;
+
 //fills input buffer char by char
-void fill_input_buffer(char *input_buffer, struct termios *original) {
+void fill_input_buffer(char *input_buffer) {
   int cursor = 0;
 
   memset(input_buffer, 0, MAX_COMMAND_LENGTH);
@@ -82,7 +85,7 @@ void fill_input_buffer(char *input_buffer, struct termios *original) {
     }
     else if (c == 4) {//Ctrl+D EOF
       //printf("\nExiting shell...\n");
-      disableRawMode(original);
+      disableRawMode(&original);
       exit(0);
       //return 0;
     }
