@@ -11,6 +11,9 @@
 
 #include "colors.h"
 
+int setvalue = 0;
+char * home;
+
 //print the prompt
 void prompt_print(){
   //dynamically stores cwd in string
@@ -19,18 +22,18 @@ void prompt_print(){
     perror("getcwd error");
   }
 
-  char * home;
   char * newCWD;
   char tilda[256];
   tilda[0] = '~';
   tilda[1] = '\0';
-  if ((home = getenv("HOME"))){
-    if ((newCWD = strstr(cwd, home))){
+  if (!setvalue) {setvalue = 1; home = getenv("HOME");}
+  if ((newCWD = strstr(cwd, home))) {
       newCWD += strlen(home);
       strcat(tilda, newCWD);
       strcpy(cwd, tilda);
-    }
+//	fprintf(stderr, "copied\n");
   }
+  
 
   //get username with struct passwd
   uid_t usr = geteuid();
