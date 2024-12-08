@@ -24,12 +24,10 @@ void prompt_print(){
   tilda[0] = '~';
   tilda[1] = '\0';
   if ((home = getenv("HOME"))){
-    //printf("Home: %s\n",home);
     if ((newCWD = strstr(cwd, home))){
       newCWD += strlen(home);
       strcat(tilda, newCWD);
       strcpy(cwd, tilda);
-      //printf("%s\n", cwd);
     }
   }
 

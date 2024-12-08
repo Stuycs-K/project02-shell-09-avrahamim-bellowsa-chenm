@@ -21,6 +21,9 @@
 
 ## Attempted features and bugs
 
+attempted to support history and scrolling through history with cntrl + \ (see branch history)
+attempted to support parsing any redirection sequence.
+ 
 ## Function headers
 ```
 int parse_args( char * line, char ** arg_ary );

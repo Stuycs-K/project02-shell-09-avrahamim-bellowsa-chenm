@@ -32,17 +32,10 @@ char * removeSpace(char * line, char * newLine, int index){
   int j = 0;
   for (int i = 0; i < strlen(line); i++){
     if (i != index){
-      //printf("i: %d %c, j: %d %c\n", i, *(line + i), j, *(newLine + j));
       *(newLine + j) = *(line + i);
       j++;
     }
   }
   *(newLine + strlen(line) - 1) = 0;
-  // for (int i = 0; i < strlen(newLine); i++){
-  //   printf("New: %c\n", *(newLine + i));
-  // }
-  // for (int i = 0; i < strlen(line); i++){
-  //   printf("Old: %c\n", *(line + i));
-  // }
   return newLine;
 }
