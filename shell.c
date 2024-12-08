@@ -17,11 +17,15 @@
 #include "util.h"
 #include "redirect.h"
 #include "run.h"
+#include "history.h"
 
 #define MAXOPPS 256
 
+struct termios original;
+
 int special_cmd(char ** arg_ary){
   if(!strcmp(arg_ary[0], "exit")) {
+    disableRawMode(&original);
     exit(0);
   }
   //if it was cd change dir
@@ -43,6 +47,8 @@ void sighandler(int signo){
 }
 
 int main(){
+  enableRawMode(&original);
+  
   struct sigaction sa;
   struct sigaction old;
   sa.sa_handler = sighandler;
@@ -53,7 +59,56 @@ int main(){
   prompt_print();
 
   char input_buffer[BUFFER_SIZE];
-  while (fgets(input_buffer, BUFFER_SIZE, stdin)){
+  int cursor = 0;
+  while (1){
+    cursor = 0;
+
+    memset(input_buffer, 0, MAX_COMMAND_LENGTH);
+    while (1) {
+      char c;
+      if (read(STDIN_FILENO, &c, 1) == -1) continue;
+
+      if (c == '\n') {
+        printf("\n");
+        if (cursor > 0) {
+          add_to_history(input_buffer);
+          history_index = history_count;  // Reset index
+        }
+        break;
+      }
+      else if (c == 127) {  // Handle backspace
+        if (cursor > 0) {
+          input_buffer[--cursor] = '\0';
+          printf("\b \b"); fflush(stdout);
+        }
+      }
+      else if (c == '\033') {  // Escape sequence
+        char seq[2];
+        if (read(STDIN_FILENO, &seq[0], 1) == -1) continue;
+        if (read(STDIN_FILENO, &seq[1], 1) == -1) continue;
+
+        if (seq[0] == '[') {
+          if (seq[1] == 'A') {  // Up arrow
+            handle_up_arrow(input_buffer, &cursor);
+          } else if (seq[1] == 'B') {  // Down arrow
+            handle_down_arrow(input_buffer, &cursor);
+          }
+        }
+      }
+      else if (c == 4) {  // Handle Ctrl+D (EOF)
+        //printf("\nExiting shell...\n");
+        disableRawMode(&original);
+        exit(0);
+        //return 0;
+      }
+      else {
+        printf("%c",c); fflush(stdout);
+        input_buffer[cursor++] = c;
+      }
+    }
+    
+    //fprintf(stderr, "%s\n", input_buffer);
+    //fprintf(stderr, "%d\n", strcmp(input_buffer, "exit"));
 
     char * lines_ary[TOKEN_SIZE];
 
@@ -80,5 +135,7 @@ int main(){
     }
     prompt_print();
   }
+  
+  disableRawMode(&original);
   return 0;
 }

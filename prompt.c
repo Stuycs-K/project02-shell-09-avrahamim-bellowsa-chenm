@@ -38,7 +38,7 @@ void prompt_print(){
   struct passwd * pas = getpwuid(usr);
 
 
-  printf("\n");
+  //printf("\n");
   printf(GREEN"%s"COLOREND":"BLUE"%s"COLOREND"$ ", pas->pw_name, cwd);
   fflush(stdout);
 
