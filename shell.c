@@ -72,30 +72,31 @@ int main(){
         printf("\n");
         if (cursor > 0) {
           add_to_history(input_buffer);
-          history_index = history_count;  // Reset index
+          history_index = history_count;
         }
         break;
       }
-      else if (c == 127) {  // Handle backspace
+      else if (c == 127) {//backspace
         if (cursor > 0) {
           input_buffer[--cursor] = '\0';
           printf("\b \b"); fflush(stdout);
         }
       }
-      else if (c == '\033') {  // Escape sequence
+      else if (c == '\033') {//escape sequence
         char seq[2];
         if (read(STDIN_FILENO, &seq[0], 1) == -1) continue;
         if (read(STDIN_FILENO, &seq[1], 1) == -1) continue;
 
         if (seq[0] == '[') {
-          if (seq[1] == 'A') {  // Up arrow
+          if (seq[1] == 'A') {//up arrow
             handle_up_arrow(input_buffer, &cursor);
-          } else if (seq[1] == 'B') {  // Down arrow
+          }
+          else if (seq[1] == 'B') {//down arrow
             handle_down_arrow(input_buffer, &cursor);
           }
         }
       }
-      else if (c == 4) {  // Handle Ctrl+D (EOF)
+      else if (c == 4) {//Ctrl+D EOF
         //printf("\nExiting shell...\n");
         disableRawMode(&original);
         exit(0);

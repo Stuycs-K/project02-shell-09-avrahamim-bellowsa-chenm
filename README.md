@@ -18,11 +18,17 @@
    - Supports < | and > symbols
    - < must be the first of the redirection symbols in a command, and > must be the last of the redirection symbols in a command
    - a < b | c > d is the maximum redirection capabilities supported
+6. History
+   - Suports scrolling through previous commands via up/down arrows
+   - Tradeoff is that it doesn't support editing commands currently being written via left/right arrows
 
 ## Attempted features and bugs
 
 attempted to support history and scrolling through history with cntrl + \ (see branch history)
 attempted to support parsing any redirection sequence.
+
+can't use left/right to edit lines, WILL create a buggy shell if done so
+any invalid commands will also create a buggy shell
  
 ## Function headers
 ```
@@ -49,5 +55,11 @@ void sighandler(int signo);
 int check_err(int err, char * err_type); 
 void stripln(char * string);
 char * removeSpace(char * line, char * newLine, int index);
+
+void enableRawMode(struct termios *original);
+void disableRawMode(struct termios *original);
+void add_to_history(const char *command);
+void handle_up_arrow(char *buffer, int *cursor);
+void handle_down_arrow(char *buffer, int *cursor);
 ```
 
