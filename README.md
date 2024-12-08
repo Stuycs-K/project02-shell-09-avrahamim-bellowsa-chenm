@@ -28,7 +28,7 @@ attempted to support history and scrolling through history with cntrl + \ (see b
 attempted to support parsing any redirection sequence.
 
 can't use left/right to edit lines, WILL create a buggy shell if done so
-any invalid commands will also create a buggy shell
+any invalid commands or weird characters will also create a buggy shell
  
 ## Function headers
 ```

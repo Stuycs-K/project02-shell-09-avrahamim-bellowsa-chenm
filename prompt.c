@@ -11,6 +11,7 @@
 
 #include "colors.h"
 
+//print the prompt
 void prompt_print(){
   //dynamically stores cwd in string
   char *cwd = getcwd(NULL, 0);

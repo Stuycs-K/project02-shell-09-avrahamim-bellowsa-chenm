@@ -9,6 +9,7 @@
 #include <errno.h>
 #include "util.h"
 
+//parse the args for execvp
 int parse_args( char * line, char ** arg_ary ){
   int argIndex = 0;
   while (line){
@@ -19,6 +20,7 @@ int parse_args( char * line, char ** arg_ary ){
   return argIndex;
 }
 
+//parses set of semicolon seperated lines into ary
 void parse_lines(char * input, char ** line_ary){
   int i;
   for (i = 0; input; i++){
@@ -38,6 +40,7 @@ int min(int * intv, int s){
   return min_index;
 }
 
+//finds the first example of < | or > in line and passes it into sep_on
 // Takes line and looks for the first instance of < | or >, then puts that in sep_on
 void sep_on_first_char(char * line, char * sep_on){ //sep_on must be malloced!!
   //goal is to sep on <, >, |
@@ -69,6 +72,7 @@ void sep_on_first_char(char * line, char * sep_on){ //sep_on must be malloced!!
   strcpy(sep_on,symbolv[min_length]);
 }
 
+//parse a cmd sequence with redirects into a ary
 void parse_opps(char * line, char ** opp_seperated_ary, int* size){
   int s = *size;
   char * sep_on = malloc(4);
