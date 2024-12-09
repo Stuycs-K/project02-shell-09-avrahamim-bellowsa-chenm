@@ -94,7 +94,7 @@ void fill_input_buffer(char *input_buffer) {
       //return 0;
     }
     else {
-      //printf("%c",c);
+      printf("%c",c);
       fflush(stdout);
       input_buffer[cursor] = c;
       cursor++;
