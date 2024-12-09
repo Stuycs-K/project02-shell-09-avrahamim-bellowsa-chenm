@@ -23,10 +23,9 @@
 
 ## Attempted features and bugs
 
-attempted to support history and scrolling through history with cntrl + \ (see branch history)
-attempted to support parsing any redirection sequence.
+Attempted to support parsing any redirection sequence.
 
-any invalid commands or weird characters will create a buggy shell
+If the shell is run from a redirection (./shell < input.txt or something of that nature) the prompt will print again for each command run from the file, after which the correct output will print.
  
 ## Function headers
 ```
