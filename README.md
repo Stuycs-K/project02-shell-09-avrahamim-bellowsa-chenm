@@ -25,8 +25,6 @@
 
 Attempted to support parsing any redirection sequence.
 
-If the shell is run from a redirection (./shell < input.txt or something of that nature) the prompt will print again for each command run from the file, after which the correct output will print.
- 
 ## Function headers
 ```
 int parse_args( char * line, char ** arg_ary );

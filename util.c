@@ -54,14 +54,10 @@ void fill_input_buffer(char *input_buffer) {
   while (1) {
     char c;
     int bytes = read(STDIN_FILENO, &c, 1);
-    if (bytes == 0){
-      disableRawMode(&original);
-      fflush(stdout);
-      exit(0);
 
-    }
-    if (bytes == -1) {
-      continue;
+    if (c == 0) {
+      disableRawMode(&original);
+	exit(0);
     }
     if (c == '\n') {
       printf("\n");
@@ -104,6 +100,7 @@ void fill_input_buffer(char *input_buffer) {
       input_buffer[cursor] = c;
       cursor++;
       if (cursor > MAX_COMMAND_LENGTH){
+      disableRawMode(&original);
         exit(0);
       }
     }
