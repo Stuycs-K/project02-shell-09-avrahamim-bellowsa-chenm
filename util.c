@@ -53,7 +53,11 @@ void fill_input_buffer(char *input_buffer) {
   memset(input_buffer, 0, MAX_COMMAND_LENGTH);
   while (1) {
     char c;
-    if (read(STDIN_FILENO, &c, 1) == -1) continue;
+    int bytes = read(STDIN_FILENO, &c, 1);
+    if (bytes==0){
+      exit(0);
+    }
+    if (bytes == -1) continue;
     if (c == '\n') {
       printf("\n");
       if (cursor > 0) {
@@ -91,7 +95,12 @@ void fill_input_buffer(char *input_buffer) {
     }
     else {
       printf("%c",c); fflush(stdout);
-      input_buffer[cursor++] = c;
+      input_buffer[cursor] = c;
+      cursor++;
+      if (cursor > MAX_COMMAND_LENGTH){
+        printf("EOF %c, %hhd\n", c,c);
+        exit(0);
+      }
     }
   }
 }
