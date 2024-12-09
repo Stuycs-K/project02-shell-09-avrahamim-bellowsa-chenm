@@ -83,12 +83,11 @@ int main(){
       parse_opps(myline, chunks, &size);
       size--;
 
-
+      disableRawMode(&original);
       flow_execution(chunks,0,size,old);
+      enableRawMode(&original);
       free(myline);
-      // for (int i = 0; i < size; i++){
-      //   free(chunks[i]);
-      // }
+
     }
     prompt_print();
   }

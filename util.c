@@ -54,7 +54,6 @@ void fill_input_buffer(char *input_buffer) {
   while (1) {
     char c;
     if (read(STDIN_FILENO, &c, 1) == -1) continue;
-
     if (c == '\n') {
       printf("\n");
       if (cursor > 0) {

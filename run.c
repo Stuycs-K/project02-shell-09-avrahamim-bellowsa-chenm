@@ -84,6 +84,10 @@
         }
       }
     }
+
+    for (int i = 0; i<size; i++){
+      free(chunks[i]);
+    }
   }
 
   //run a cmd_block including reset signal handling
