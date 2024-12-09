@@ -41,8 +41,11 @@ void prompt_print(){
 
 
   //printf("\n");
-  printf(GREEN"%s"COLOREND":"BLUE"%s"COLOREND"$ ", pas->pw_name, cwd);
-  fflush(stdout);
+  char prompt[1000];
+  sprintf(prompt,GREEN"%s"COLOREND":"BLUE"%s"COLOREND"$ ", pas->pw_name, cwd );
+  fputs(prompt, stderr);
+  // printf(GREEN"%s"COLOREND":"BLUE"%s"COLOREND"$ ", pas->pw_name, cwd);
+  fflush(stderr);
 
   free(cwd);
 }
