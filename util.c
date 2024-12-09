@@ -85,6 +85,7 @@ void fill_input_buffer(char *input_buffer) {
     else if (c == 4) {//Ctrl+D EOF
       //printf("\nExiting shell...\n");
       disableRawMode(&original);
+      fflush(stdout);
       exit(0);
       //return 0;
     }

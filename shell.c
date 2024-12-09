@@ -50,7 +50,6 @@ void sighandler(int signo){
 
 int main(){
   enableRawMode(&original);
-  
   struct sigaction sa;
   struct sigaction old;
   sa.sa_handler = sighandler;

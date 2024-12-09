@@ -109,7 +109,9 @@
         sigaction(SIGINT, &old, NULL);
        
         int exec_vp_result = execvp(arg_ary[0], arg_ary);
-        
+        if(exec_vp_result==-1){
+          exit(0);
+        }
       }
       else{
         int status;
