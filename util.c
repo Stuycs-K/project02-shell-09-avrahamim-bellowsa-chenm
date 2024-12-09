@@ -55,7 +55,10 @@ void fill_input_buffer(char *input_buffer) {
     char c;
     int bytes = read(STDIN_FILENO, &c, 1);
     if (bytes == 0){
+      disableRawMode(&original);
+      fflush(stdout);
       exit(0);
+
     }
     if (bytes == -1) {
       continue;
